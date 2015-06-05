@@ -31,5 +31,5 @@ ipaddr="${ipaddr%%,}" # remove tail ","
 {
   . ${BASH_SOURCE[0]%/*}/retry.sh
   retry_until "ping -c 1 -W 3 ${ipaddr}"
-  retry_until "nc ${ipaddr} 22 <<< ''"
+  retry_until "nc -w 3 ${ipaddr} 22 <<< ''"
 } 2>&1 | sed "s,^,[D:${$}] ," >&2
