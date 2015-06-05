@@ -325,8 +325,8 @@ mussel instance wait-for-ssh     ${instance_id} --private-key ${private_key} --u
 
 mussel
 
-1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
-2. mussel createに`--output-format simple`オプションを導入し、スクリプト作成をしやすくする
+1. musselに`wait-for`コマンド群を用意し、ユーティリティとの組み合せを可能な限り排除する
+2. 主に`mussel create`に`--output-format simple`オプションを導入し、スクリプト作成をしやすくする。
 
 API
 
