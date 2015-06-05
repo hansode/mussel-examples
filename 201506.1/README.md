@@ -262,7 +262,7 @@ retry_until "nc -w 3 ${ipaddr} 22 <<< '' >/dev/null"
 ## スクリプト改善点
 
 1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
-2. mussel createの結果がシェルスクリプトが評価可能な結果であると良い。そこで、createに`--output-format shell`オプションを導入してみる。
+2. mussel createの結果がuuidだけだと良い。そこで、createに`--output-format simple`オプションを導入してみる。
 
 例えばmussel ssh_key_pair createの結果は、`ssh_key_id=ssh-xxxxxxxx`だ。
 
@@ -280,10 +280,10 @@ set -x
 
 #
 ssh-keygen -N "" -f mykeypair
-eval "$(
+ssh_key_id"$(
   mussel ssh_key_pair create \
    --public-key    mykeypair.pub \
-   --output-format shell
+   --output-format simple
 )"
 
 #
@@ -291,10 +291,10 @@ cat <<EOS > sgrule.txt
 icmp:-1,-1,ip4:0.0.0.0/0
 tcp:22,22,ip4:0.0.0.0/0
 EOS
-eval="$(
+security_group_id="$(
   mussel security_group create \
    --rule          sgrule.txt \
-   --output-format shell
+   --output-format simple
 )"
 
 #
@@ -302,7 +302,7 @@ cat <<EOS > vifs.json
 {
  "eth0":{"network":"nw-demo1","security_groups":"${security_group_id}"}
 }
-eval="$(
+instance_id="$(
   mussel instance create \
    --cpu-cores     1              \
    --hypervisor    kvm            \
@@ -310,7 +310,7 @@ eval="$(
    --memory-size   512            \
    --ssh-key-id    ${ssh_key_id}  \
    --vifs          vifs.json      \
-   --output-format shell
+   --output-format simple
 )"
 
 #
@@ -321,9 +321,14 @@ mussel instance wait-for-ssh     ${instance_id} --private-key ${private_key} --u
 
 大分すっきりした。
 
-## 補足: APIに対する改善案
+## 今後へ向けた改善案
 
-生成時に知っておけばよい情報は、uuidだけである。現在のAPIは、レスポンスメッセージに詳細情報を返して来るが、クライアント視点では、その大半が無駄な情報である。
+mussel
+
+1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
+2. mussel createに`--output-format simple`オプションを導入し、スクリプト作成をしやすくする
+
+API
 
 1. GETは、詳細情報を返し
-2. POST, PUT, DELETEは、最小限の情報だけを返す
+2. POST, PUT, DELETEは、最小限情報であるuuidだけを返す
