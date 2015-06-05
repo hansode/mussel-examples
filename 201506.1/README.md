@@ -167,7 +167,11 @@ $ ssh -i mykeypair root@10.0.22.104 hostname
 # => bbgjyac9
 ```
 
-生成時に知っておけばよい情報は、uuidだけである。現在のAPIは、レスポンスメッセージに詳細情報を返して来る。クライアント視点では、その大半が無駄な情報である。次に、インスタンス作成後には期待する状態になるまで待つ必要がある。それらを反映した場合のシェルスクリプト例。
+生成時に知っておけばよい情報は、uuidだけである。現在のAPIは、レスポンスメッセージに詳細情報を返して来るが、クライアントからすると、その大半が無駄な情報である。
+
+## 1枚スクリプト化
+
+まとめた手順を一枚のスクリプトにまとめてみる。
 
 ```
 #!/bin/bash
@@ -255,10 +259,17 @@ retry_until "ping -c 1 -W 3 ${ipaddr}    >/dev/null"
 retry_until "nc -w 3 ${ipaddr} 22 <<< '' >/dev/null"
 ```
 
-## 改善点
+## スクリプト改善点
 
-1. クライアントツールにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
-2. mussel createの結果がシェルスクリプトが評価可能な結果であると良い。そこで、createに`--output-type shell`オプションを導入してみる。例えばmussel instance createの結果は、`instance_id=i-xxxxx`である。
+1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
+2. mussel createの結果がシェルスクリプトが評価可能な結果であると良い。そこで、createに`--output-format shell`オプションを導入してみる。
+
+例えばmussel ssh_key_pair createの結果は、`ssh_key_id=ssh-xxxxxxxx`だ。
+
+> ```
+> $ mussel ssh_key_pair create --public-key  mykeypair.pub --output-format shell
+> ssh_key_id=ssh-xxxxxxxx
+> ```
 
 ```
 #!/bin/bash
@@ -271,8 +282,8 @@ set -x
 ssh-keygen -N "" -f mykeypair
 eval "$(
   mussel ssh_key_pair create \
-   --public-key  mykeypair.pub \
-   --output-type shell
+   --public-key    mykeypair.pub \
+   --output-format shell
 )"
 
 #
@@ -282,8 +293,8 @@ tcp:22,22,ip4:0.0.0.0/0
 EOS
 eval="$(
   mussel security_group create \
-   --rule        sgrule.txt \
-   --output-type shell
+   --rule          sgrule.txt \
+   --output-format shell
 )"
 
 #
@@ -293,13 +304,13 @@ cat <<EOS > vifs.json
 }
 eval="$(
   mussel instance create \
-   --cpu-cores    1              \
-   --hypervisor   kvm            \
-   --image-id     wmi-centos1d64 \
-   --memory-size  512            \
-   --ssh-key-id   ${ssh_key_id}  \
-   --vifs         vifs.json      \
-   --output-type  shell
+   --cpu-cores     1              \
+   --hypervisor    kvm            \
+   --image-id      wmi-centos1d64 \
+   --memory-size   512            \
+   --ssh-key-id    ${ssh_key_id}  \
+   --vifs          vifs.json      \
+   --output-format shell
 )"
 
 #
@@ -309,3 +320,10 @@ mussel instance wait-for-ssh     ${instance_id} --private-key ${private_key} --u
 ```
 
 大分すっきりした。
+
+## 補足: APIに対する改善案
+
+生成時に知っておけばよい情報は、uuidだけである。現在のAPIは、レスポンスメッセージに詳細情報を返して来るが、クライアント視点では、その大半が無駄な情報である。
+
+1. GETは、詳細情報を返し
+2. POST, PUT, DELETEは、最小限の情報だけを返す
