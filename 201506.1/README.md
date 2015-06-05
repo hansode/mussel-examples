@@ -267,11 +267,11 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
 2. mussel createの結果がuuidだけだと良い。そこで、createに`--output-format simple`オプションを導入してみる。
 
-例えばmussel ssh_key_pair createの結果は、`ssh_key_id=ssh-xxxxxxxx`だ。
+例えばmussel ssh_key_pair createの結果は、`ssh-xxxxxxxx`だ。
 
 > ```
 > $ mussel ssh_key_pair create --public-key  mykeypair.pub --output-format shell
-> ssh_key_id=ssh-xxxxxxxx
+> ssh-xxxxxxxx
 > ```
 
 ```
