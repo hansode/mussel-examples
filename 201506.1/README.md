@@ -270,7 +270,7 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 例えばmussel ssh_key_pair createの結果は、`ssh-xxxxxxxx`だ。
 
 > ```
-> $ mussel ssh_key_pair create --public-key  mykeypair.pub --output-format shell
+> $ mussel ssh_key_pair create --public-key  mykeypair.pub --output-format simple
 > ssh-xxxxxxxx
 > ```
 
