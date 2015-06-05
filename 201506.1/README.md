@@ -167,14 +167,7 @@ $ ssh -i mykeypair root@10.0.22.104 hostname
 # => bbgjyac9
 ```
 
-生成時に知っておけばよい情報は、uuidだけである。現在のAPIは、レスポンスメッセージに詳細情報を返して来る。クライアント視点では、その大半が無駄な情報である。次に、インスタンス作成後には期待する状態になるまで待つ必要がある。
-
-## 改善点
-
-1. APIのPOSTのレスポンスメッセージには、uuidだけをす。詳情情報はGETにより取得可能
-2. クライアントツールにはwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
-
-これらを反映した場合のシェルスクリプト例。
+生成時に知っておけばよい情報は、uuidだけである。現在のAPIは、レスポンスメッセージに詳細情報を返して来る。クライアント視点では、その大半が無駄な情報である。次に、インスタンス作成後には期待する状態になるまで待つ必要がある。それらを反映した場合のシェルスクリプト例。
 
 ```
 #!/bin/bash
@@ -187,7 +180,9 @@ set -x
 ssh-keygen -N "" -f mykeypair
 ssh_key_id="$(
   mussel ssh_key_pair create \
-    --public-key mykeypair.pub
+    --public-key mykeypair.pub \
+  | egrep ^:id: \
+  | awk '{print $2}'
 )"
 
 #
@@ -197,7 +192,9 @@ tcp:22,22,ip4:0.0.0.0/0
 EOS
 security_group_id="$(
   mussel security_group create \
-    --rule sgrule.txt
+    --rule sgrule.txt \
+  | egrep ^:id: \
+  | awk '{print $2}'
 )"
 
 #
@@ -207,12 +204,102 @@ cat <<EOS > vifs.json
 }
 instance_id="$(
   mussel instance create \
+    --cpu-cores    1              \
+    --hypervisor   kvm            \
+    --image-id     wmi-centos1d64 \
+    --memory-size  512            \
+    --ssh-key-id   ${ssh_key_id}  \
+    --vifs         vifs.json      \
+  | egrep ^:id: \
+  | awk '{print $2}'
+)"
+
+#
+
+function retry_until() {
+  local blk="$@"
+
+  local wait_sec=${RETRY_WAIT_SEC:-120}
+  local sleep_sec=${RETRY_SLEEP_SEC:-3}
+  local tries=0
+  local start_at=$(date +%s)
+  local chk_cmd=
+
+  while :; do
+    eval "${blk}" && {
+      break
+    } || {
+      sleep ${sleep_sec}
+    }
+
+    tries=$((${tries} + 1))
+    if [[ "$(($(date +%s) - ${start_at}))" -gt "${wait_sec}" ]]; then
+      echo "Retry Failure: Exceed ${wait_sec} sec: Retried ${tries} times" >&2
+      return 1
+    fi
+    echo [$(date +%FT%X) "#$$"] time:${tries} "eval:${chk_cmd}" >&2
+  done
+}
+
+#
+
+retry_until [[ '"$(mussel instance show "${instance_id}" | egrep -w "^:state: running")"' ]]
+
+ipaddr="$(
+  mussel instance show "${instance_id}" \
+  | egrep ":address:" \
+  | awk '{print $2}'
+)"
+
+retry_until "ping -c 1 -W 3 ${ipaddr}    >/dev/null"
+retry_until "nc -w 3 ${ipaddr} 22 <<< '' >/dev/null"
+```
+
+## 改善点
+
+1. クライアントツールにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
+2. mussel createの結果がシェルスクリプトが評価可能な結果であると良い。そこで、createに`--output-type shell`オプションを導入してみる。例えばmussel instance createの結果は、`instance_id=i-xxxxx`である。
+
+```
+#!/bin/bash
+
+set -e
+set -o pipefail
+set -x
+
+#
+ssh-keygen -N "" -f mykeypair
+eval "$(
+  mussel ssh_key_pair create \
+   --public-key  mykeypair.pub \
+   --output-type shell
+)"
+
+#
+cat <<EOS > sgrule.txt
+icmp:-1,-1,ip4:0.0.0.0/0
+tcp:22,22,ip4:0.0.0.0/0
+EOS
+eval="$(
+  mussel security_group create \
+   --rule        sgrule.txt \
+   --output-type shell
+)"
+
+#
+cat <<EOS > vifs.json
+{
+ "eth0":{"network":"nw-demo1","security_groups":"${security_group_id}"}
+}
+eval="$(
+  mussel instance create \
    --cpu-cores    1              \
    --hypervisor   kvm            \
    --image-id     wmi-centos1d64 \
    --memory-size  512            \
    --ssh-key-id   ${ssh_key_id}  \
-   --vifs         vifs.json
+   --vifs         vifs.json      \
+   --output-type  shell
 )"
 
 #
@@ -220,3 +307,5 @@ mussel instance wait-for-state   ${instance_id} --state running
 mussel instance wait-for-network ${instance_id} --state open
 mussel instance wait-for-ssh     ${instance_id} --private-key ${private_key} --user root hostname
 ```
+
+大分すっきりした。
