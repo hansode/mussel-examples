@@ -274,6 +274,8 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 > ssh-xxxxxxxx
 > ```
 
+改善点を反映したスクリプトを書いてみると、こうなる。
+
 ```
 #!/bin/bash
 
