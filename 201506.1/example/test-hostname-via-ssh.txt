@@ -1,0 +1,329 @@
++ trap '
+{
+ if [[ -n "${instance_id}" ]]; then
+   instance_id="${instance_id}" \
+   ./instance-destroy.sh
+ fi
+ if [[ -n "${security_group_id}" ]]; then
+   security_group_id="${security_group_id}" \
+   ./security_group-destroy.sh
+ fi
+ if [[ -n "${ssh_key_id}" ]]; then
+   ssh_key_id="${ssh_key_id}" \
+   ./ssh_key_pair-destroy.sh
+ fi
+ rm -f "${private_key}"
+ rm -f "${public_key}"
+} | sed "s,^,[D:${$}] ," >&2
+' ERR EXIT
++ rule=./sgrule.txt
++ vifs=./vifs.json
++ network_id=nw-demo1
++ cpu_cores=1
++ hypervisor=kvm
++ memory_size=256
++ image_id=wmi-centos1d64
++ ssh_user=root
+++ ./gen-keypair.sh
+[D:14871] Generating public/private rsa key pair.
+[D:14871] Your identification has been saved in keypair.14871.
+[D:14871] Your public key has been saved in keypair.14871.pub.
+[D:14871] The key fingerprint is:
+[D:14871] 7e:60:12:02:20:d4:10:a5:2d:db:a7:a7:36:f5:74:74 knoppix@Microknoppix
+[D:14871] The key's randomart image is:
+[D:14871] +--[ RSA 2048]----+
+[D:14871] |+=*.             |
+[D:14871] |. oo             |
+[D:14871] | o .. .          |
+[D:14871] |  +  . . . E     |
+[D:14871] | . . .. S .      |
+[D:14871] |    o. = o       |
+[D:14871] |   ...o o .      |
+[D:14871] |   oo  . .       |
+[D:14871] |  ...            |
+[D:14871] +-----------------+
+[D:14871] -rw------- 1 knoppix knoppix 1675 Jun  4 21:06 keypair.14871
+[D:14871] -rw-r--r-- 1 knoppix knoppix  402 Jun  4 21:06 keypair.14871.pub
++ eval 'private_key=keypair.14871
+public_key=keypair.14871.pub'
+++ private_key=keypair.14871
+++ public_key=keypair.14871.pub
++ : keypair.14871.pub
++ : keypair.14871
+++ public_key=keypair.14871.pub
+++ ./ssh_key_pair-create.sh
+[S:14876] ---
+[S:14876] :id: ssh-3x4lnr6t
+[S:14876] :account_id: a-shpoolxx
+[S:14876] :uuid: ssh-3x4lnr6t
+[S:14876] :finger_print: f0:5c:cc:bc:fd:65:b6:b3:4a:db:9d:93:f9:85:82:d9
+[S:14876] :public_key: |
+[S:14876]   ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtbZM7aS6Z6vS0FwyzQRIFMPMCGnAbueI+vvgodWX2dpGhLKt7v8xUBNQ5jpJDbHtLdC4F4Gohds4RP727pAgh5xmYuv05eEY5bDR60LhhTbdWdL4f6JQ8/nxDPWmA38yi7WndcGv9ygYGoEGeq5+WsdcwFmKic4mWs4qexlMsSFhjNpKOBpjQ6FlkaU+8Ktli487v++qxZv6t0eTSqko2noRWdp+lhpaOHHbsBA2rdgAogk+nqs9Tmh6HOkPgYNhPoqXjGXpoXMKc/uRAkke2OFnb1GdNC8P6En8pUd51kc5p5WBh8idT4ai5n4x1z9gv6izGn/RXo6wcyKGb2LEp knoppix@Microknoppix
+[S:14876] :description: ''
+[S:14876] :created_at: 2015-06-04 12:06:37.000000000 Z
+[S:14876] :updated_at: 2015-06-04 12:06:37.000000000 Z
+[S:14876] :service_type: std
+[S:14876] :display_name: keypair.14871.pub
+[S:14876] :deleted_at: 
+[S:14876] :labels: []
++ eval ssh_key_id=ssh-3x4lnr6t
+++ ssh_key_id=ssh-3x4lnr6t
++ : ssh-3x4lnr6t
+++ rule=./sgrule.txt
+++ ./security_group-create.sh
+[S:14950] ---
+[S:14950] :id: sg-2v18bqpq
+[S:14950] :account_id: a-shpoolxx
+[S:14950] :uuid: sg-2v18bqpq
+[S:14950] :created_at: 2015-06-04 12:06:37.000000000 Z
+[S:14950] :updated_at: 2015-06-04 12:06:37.000000000 Z
+[S:14950] :description: 
+[S:14950] :rule: |
+[S:14950]   icmp:-1,-1,ip4:0.0.0.0/0
+[S:14950]   tcp:22,22,ip4:0.0.0.0/0
+[S:14950]   tcp:80,80,ip4:0.0.0.0/0
+[S:14950]   tcp:8080,8080,ip4:0.0.0.0/0
+[S:14950] :service_type: std
+[S:14950] :display_name: ''
+[S:14950] :labels: []
+[S:14950] :rules:
+[S:14950] - :ip_protocol: icmp
+[S:14950]   :icmp_type: -1
+[S:14950]   :icmp_code: -1
+[S:14950]   :protocol: ip4
+[S:14950]   :ip_source: 0.0.0.0/0
+[S:14950] - :ip_protocol: tcp
+[S:14950]   :ip_fport: 22
+[S:14950]   :ip_tport: 22
+[S:14950]   :protocol: ip4
+[S:14950]   :ip_source: 0.0.0.0/0
+[S:14950] - :ip_protocol: tcp
+[S:14950]   :ip_fport: 80
+[S:14950]   :ip_tport: 80
+[S:14950]   :protocol: ip4
+[S:14950]   :ip_source: 0.0.0.0/0
+[S:14950] - :ip_protocol: tcp
+[S:14950]   :ip_fport: 8080
+[S:14950]   :ip_tport: 8080
+[S:14950]   :protocol: ip4
+[S:14950]   :ip_source: 0.0.0.0/0
++ eval security_group_id=sg-2v18bqpq
+++ security_group_id=sg-2v18bqpq
++ : sg-2v18bqpq
+++ vifs=./vifs.json
+++ network_id=nw-demo1
+++ security_group_id=sg-2v18bqpq
+++ ./gen-vifs.sh
+[D:15023] {
+[D:15023]  "eth0":{"network":"nw-demo1","security_groups":"sg-2v18bqpq"}
+[D:15023] }
++ eval vifs=./vifs.json
+++ vifs=./vifs.json
++ : ./vifs.json
+++ cpu_cores=1
+++ hypervisor=kvm
+++ memory_size=256
+++ image_id=wmi-centos1d64
+++ ssh_key_id=ssh-3x4lnr6t
+++ vifs=./vifs.json
+++ ./instance-create.sh
+[S:15027] ---
+[S:15027] :id: i-bbgjyac9
+[S:15027] :account_id: a-shpoolxx
+[S:15027] :host_node: 
+[S:15027] :cpu_cores: 1
+[S:15027] :memory_size: 256
+[S:15027] :arch: x86_64
+[S:15027] :image_id: wmi-centos1d64
+[S:15027] :created_at: 2015-06-04 12:06:38.000000000 Z
+[S:15027] :updated_at: 2015-06-04 12:06:38.339437376 Z
+[S:15027] :terminated_at: 
+[S:15027] :deleted_at: 
+[S:15027] :state: scheduling
+[S:15027] :status: init
+[S:15027] :ssh_key_pair:
+[S:15027]   :uuid: ssh-3x4lnr6t
+[S:15027]   :display_name: keypair.14871.pub
+[S:15027] :volume:
+[S:15027] - :vol_id: vol-wfxls1ws
+[S:15027]   :state: scheduling
+[S:15027] :vif: []
+[S:15027] :hostname: bbgjyac9
+[S:15027] :ha_enabled: 0
+[S:15027] :hypervisor: kvm
+[S:15027] :display_name: '20150604210639'
+[S:15027] :service_type: std
+[S:15027] :monitoring:
+[S:15027]   :enabled: false
+[S:15027]   :mail_address: []
+[S:15027]   :items: {}
+[S:15027] :labels:
+[S:15027] - :resource_uuid: i-bbgjyac9
+[S:15027]   :name: monitoring.enabled
+[S:15027]   :value_type: 1
+[S:15027]   :value: 'false'
+[S:15027]   :created_at: 2015-06-04 12:06:38.000000000 Z
+[S:15027]   :updated_at: 2015-06-04 12:06:38.000000000 Z
+[S:15027] :boot_volume_id: vol-wfxls1ws
+[S:15027] :encrypted_password: 
+[D:15027] [2015-06-04T09:06:42 PM #15027] time:1 eval:
+[D:15027] [2015-06-04T09:06:45 PM #15027] time:2 eval:
+[D:15027] [2015-06-04T09:06:49 PM #15027] time:3 eval:
+[D:15027] [2015-06-04T09:06:52 PM #15027] time:4 eval:
+[D:15027] [2015-06-04T09:06:55 PM #15027] time:5 eval:
+[D:15027] [2015-06-04T09:06:58 PM #15027] time:6 eval:
+[D:15027] [2015-06-04T09:07:01 PM #15027] time:7 eval:
+[D:15027] [2015-06-04T09:07:05 PM #15027] time:8 eval:
+[D:15027] [2015-06-04T09:07:08 PM #15027] time:9 eval:
+[D:15027] [2015-06-04T09:07:11 PM #15027] time:10 eval:
+[D:15027] [2015-06-04T09:07:14 PM #15027] time:11 eval:
+[D:15027] [2015-06-04T09:07:18 PM #15027] time:12 eval:
+[D:15027] [2015-06-04T09:07:21 PM #15027] time:13 eval:
++ eval instance_id=i-bbgjyac9
+++ instance_id=i-bbgjyac9
++ : i-bbgjyac9
++ instance_id=i-bbgjyac9
++ ./instance-wait4ssh.sh
+[S:16103] ---
+[S:16103] :id: i-bbgjyac9
+[S:16103] :account_id: a-shpoolxx
+[S:16103] :host_node: hn-demo1
+[S:16103] :cpu_cores: 1
+[S:16103] :memory_size: 256
+[S:16103] :arch: x86_64
+[S:16103] :image_id: wmi-centos1d64
+[S:16103] :created_at: 2015-06-04 12:06:38.000000000 Z
+[S:16103] :updated_at: 2015-06-04 12:07:17.000000000 Z
+[S:16103] :terminated_at: 
+[S:16103] :deleted_at: 
+[S:16103] :state: running
+[S:16103] :status: init
+[S:16103] :ssh_key_pair:
+[S:16103]   :uuid: ssh-3x4lnr6t
+[S:16103]   :display_name: keypair.14871.pub
+[S:16103] :volume:
+[S:16103] - :vol_id: vol-wfxls1ws
+[S:16103]   :state: attached
+[S:16103] :vif:
+[S:16103] - :vif_id: vif-fvv6ydyu
+[S:16103]   :network_id: nw-demo1
+[S:16103]   :ipv4:
+[S:16103]     :address: 10.0.22.103
+[S:16103]     :nat_address: 
+[S:16103]   :security_groups:
+[S:16103]   - sg-2v18bqpq
+[S:16103] :hostname: bbgjyac9
+[S:16103] :ha_enabled: 0
+[S:16103] :hypervisor: kvm
+[S:16103] :display_name: '20150604210639'
+[S:16103] :service_type: std
+[S:16103] :monitoring:
+[S:16103]   :enabled: false
+[S:16103]   :mail_address: []
+[S:16103]   :items: {}
+[S:16103] :labels:
+[S:16103] - :resource_uuid: i-bbgjyac9
+[S:16103]   :name: monitoring.enabled
+[S:16103]   :value_type: 1
+[S:16103]   :value: 'false'
+[S:16103]   :created_at: 2015-06-04 12:06:38.000000000 Z
+[S:16103]   :updated_at: 2015-06-04 12:06:38.000000000 Z
+[S:16103] :boot_volume_id: vol-wfxls1ws
+[S:16103] :encrypted_password: 
+[D:16103] PING 10.0.22.103 (10.0.22.103) 56(84) bytes of data.
+[D:16103] 
+[D:16103] --- 10.0.22.103 ping statistics ---
+[D:16103] 1 packets transmitted, 0 received, 100% packet loss, time 0ms
+[D:16103] 
+[D:16103] [2015-06-04T09:07:27 PM #16103] time:1 eval:
+[D:16103] PING 10.0.22.103 (10.0.22.103) 56(84) bytes of data.
+[D:16103] 
+[D:16103] --- 10.0.22.103 ping statistics ---
+[D:16103] 1 packets transmitted, 0 received, 100% packet loss, time 0ms
+[D:16103] 
+[D:16103] [2015-06-04T09:07:33 PM #16103] time:2 eval:
+[D:16103] PING 10.0.22.103 (10.0.22.103) 56(84) bytes of data.
+[D:16103] 
+[D:16103] --- 10.0.22.103 ping statistics ---
+[D:16103] 1 packets transmitted, 0 received, 100% packet loss, time 0ms
+[D:16103] 
+[D:16103] [2015-06-04T09:07:39 PM #16103] time:3 eval:
+[D:16103] PING 10.0.22.103 (10.0.22.103) 56(84) bytes of data.
+[D:16103] 64 bytes from 10.0.22.103: icmp_req=1 ttl=64 time=1.42 ms
+[D:16103] 
+[D:16103] --- 10.0.22.103 ping statistics ---
+[D:16103] 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+[D:16103] rtt min/avg/max/mdev = 1.429/1.429/1.429/0.000 ms
+[D:16103] SSH-2.0-OpenSSH_5.3
+[D:16103] Protocol mismatch.
++ instance_id=i-bbgjyac9
++ ssh_user=root
++ private_key=keypair.14871
++ ./instance-exec.sh hostname
+[S:16209] ---
+[S:16209] :id: i-bbgjyac9
+[S:16209] :account_id: a-shpoolxx
+[S:16209] :host_node: hn-demo1
+[S:16209] :cpu_cores: 1
+[S:16209] :memory_size: 256
+[S:16209] :arch: x86_64
+[S:16209] :image_id: wmi-centos1d64
+[S:16209] :created_at: 2015-06-04 12:06:38.000000000 Z
+[S:16209] :updated_at: 2015-06-04 12:07:20.000000000 Z
+[S:16209] :terminated_at: 
+[S:16209] :deleted_at: 
+[S:16209] :state: running
+[S:16209] :status: online
+[S:16209] :ssh_key_pair:
+[S:16209]   :uuid: ssh-3x4lnr6t
+[S:16209]   :display_name: keypair.14871.pub
+[S:16209] :volume:
+[S:16209] - :vol_id: vol-wfxls1ws
+[S:16209]   :state: attached
+[S:16209] :vif:
+[S:16209] - :vif_id: vif-fvv6ydyu
+[S:16209]   :network_id: nw-demo1
+[S:16209]   :ipv4:
+[S:16209]     :address: 10.0.22.103
+[S:16209]     :nat_address: 
+[S:16209]   :security_groups:
+[S:16209]   - sg-2v18bqpq
+[S:16209] :hostname: bbgjyac9
+[S:16209] :ha_enabled: 0
+[S:16209] :hypervisor: kvm
+[S:16209] :display_name: '20150604210639'
+[S:16209] :service_type: std
+[S:16209] :monitoring:
+[S:16209]   :enabled: false
+[S:16209]   :mail_address: []
+[S:16209]   :items: {}
+[S:16209] :labels:
+[S:16209] - :resource_uuid: i-bbgjyac9
+[S:16209]   :name: monitoring.enabled
+[S:16209]   :value_type: 1
+[S:16209]   :value: 'false'
+[S:16209]   :created_at: 2015-06-04 12:06:38.000000000 Z
+[S:16209]   :updated_at: 2015-06-04 12:06:38.000000000 Z
+[S:16209] :boot_volume_id: vol-wfxls1ws
+[S:16209] :encrypted_password: 
+Warning: Permanently added '10.0.22.103' (RSA) to the list of known hosts.
+bbgjyac9
++ sed 's,^,[D:14869] ,'
++ [[ -n i-bbgjyac9 ]]
++ instance_id=i-bbgjyac9
++ ./instance-destroy.sh
+[S:16279] ---
+[S:16279] - i-bbgjyac9
+[D:16279] [2015-06-04T09:07:43 PM #16279] time:1 eval:
++ [[ -n sg-2v18bqpq ]]
++ security_group_id=sg-2v18bqpq
++ ./security_group-destroy.sh
+[S:16476] ---
+[S:16476] - sg-2v18bqpq
++ [[ -n ssh-3x4lnr6t ]]
++ ssh_key_id=ssh-3x4lnr6t
++ ./ssh_key_pair-destroy.sh
+[S:16538] ---
+[S:16538] - ssh-3x4lnr6t
++ rm -f keypair.14871
++ rm -f keypair.14871.pub
