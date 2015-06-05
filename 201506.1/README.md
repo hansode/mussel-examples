@@ -320,8 +320,8 @@ instance_id="$(
 
 #
 mussel instance wait-for-state   ${instance_id} --state running
-mussel instance wait-for-network ${instance_id} --state open
-mussel instance wait-for-ssh     ${instance_id} --private-key ${private_key} --user root hostname
+mussel instance wait-for-network ${instance_id} --state opened --protocol icmp
+mussel instance wait-for-network ${instance_id} --state opened --protocol tcp --port 22
 
 #
 ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair root@${ipaddr}" hostname
