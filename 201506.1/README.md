@@ -257,6 +257,9 @@ ipaddr="$(
 
 retry_until "ping -c 1 -W 3 ${ipaddr}    >/dev/null"
 retry_until "nc -w 3 ${ipaddr} 22 <<< '' >/dev/null"
+
+#
+ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair root@${ipaddr}" hostname
 ```
 
 ## スクリプト改善点
@@ -317,6 +320,9 @@ instance_id="$(
 mussel instance wait-for-state   ${instance_id} --state running
 mussel instance wait-for-network ${instance_id} --state open
 mussel instance wait-for-ssh     ${instance_id} --private-key ${private_key} --user root hostname
+
+#
+ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair root@${ipaddr}" hostname
 ```
 
 大分すっきりした。
