@@ -265,7 +265,7 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 ## スクリプト改善点
 
 1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
-2. mussel createの結果がuuidだけだと良い。そこで、createに`--output-format id`オプションを導入してみる。
+2. mussel createの結果がuuidだけだと良い。そこで、createに`--output-format id`オプションを導入してみる。 ※オプション名は暫定
 
 例えばmussel ssh_key_pair createの結果は、`ssh-xxxxxxxx`だ。
 
@@ -334,7 +334,7 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 ### mussel
 
 1. musselに`wait-for`コマンド群を用意し、ユーティリティとの組み合せを可能な限り排除する
-2. 主に`mussel <resource> create`に`--output-format id`オプションを導入し、スクリプト作成をしやすくする
+2. 主に`mussel <resource> create`に`--output-format id`オプションを導入し、スクリプト作成をしやすくする ※オプション名募集
 3. `mussel <resource> show`...の結果をフィルタしやすいように、ユーティリティを用意
    1. リソースの`:state:`。`wait-for`が無い場合は、良く使う。
    2. インスタンスやロードバランサーの`:address:`
