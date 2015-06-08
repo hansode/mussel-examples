@@ -265,12 +265,12 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 ## スクリプト改善点
 
 1. musselにwait-forコマンドを用意し、ユーティリティとの組み合せを可能な限り排除する
-2. mussel createの結果がuuidだけだと良い。そこで、createに`--output-format simple`オプションを導入してみる。
+2. mussel createの結果がuuidだけだと良い。そこで、createに`--output-format id`オプションを導入してみる。
 
 例えばmussel ssh_key_pair createの結果は、`ssh-xxxxxxxx`だ。
 
 > ```
-> $ mussel ssh_key_pair create --public-key  mykeypair.pub --output-format simple
+> $ mussel ssh_key_pair create --public-key  mykeypair.pub --output-format id
 > ssh-xxxxxxxx
 > ```
 
@@ -288,7 +288,7 @@ ssh-keygen -N "" -f mykeypair
 ssh_key_id"$(
   mussel ssh_key_pair create \
    --public-key    mykeypair.pub \
-   --output-format simple
+   --output-format id
 )"
 
 #
@@ -299,7 +299,7 @@ EOS
 security_group_id="$(
   mussel security_group create \
    --rule          sgrule.txt \
-   --output-format simple
+   --output-format id
 )"
 
 #
@@ -315,7 +315,7 @@ instance_id="$(
    --memory-size   512            \
    --ssh-key-id    ${ssh_key_id}  \
    --vifs          vifs.json      \
-   --output-format simple
+   --output-format id
 )"
 
 #
@@ -334,7 +334,7 @@ ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair
 ### mussel
 
 1. musselに`wait-for`コマンド群を用意し、ユーティリティとの組み合せを可能な限り排除する
-2. 主に`mussel <resource> create`に`--output-format simple`オプションを導入し、スクリプト作成をしやすくする
+2. 主に`mussel <resource> create`に`--output-format id`オプションを導入し、スクリプト作成をしやすくする
 3. `mussel <resource> show`...の結果をフィルタしやすいように、ユーティリティを用意
    1. リソースの`:state:`。`wait-for`が無い場合は、良く使う。
    2. インスタンスやロードバランサーの`:address:`
