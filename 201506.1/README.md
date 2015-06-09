@@ -90,7 +90,7 @@ runningは、まだ電源がONになっただけである。
 SSHするにはIPアドレスを知る必要がある。
 
 ```
-$ mussel instance show i-xxxxxxxx | | egrep ":address:" | awk '{print $2}'
+$ mussel instance show i-xxxxxxxx | egrep ":address:" | awk '{print $2}'
 # => 10.0.22.104
 ```
 
@@ -156,7 +156,7 @@ $ mussel instance create \
 
 $ mussel instance show i-xxxxxxxx | egrep ^:state:  # runningになるまで実施
 # => :state: running
-$ mussel instance show i-xxxxxxxx | | egrep ":address:" | awk '{print $2}'
+$ mussel instance show i-xxxxxxxx | egrep ":address:" | awk '{print $2}'
 # => 10.0.22.104
 $ ping -c 1 -W 3 10.0.22.104 >/dev/null; echo $?    # 0になるまで実施
 # => 0
