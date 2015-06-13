@@ -324,6 +324,12 @@ mussel instance wait-for-network ${instance_id} --state opened --protocol icmp
 mussel instance wait-for-network ${instance_id} --state opened --protocol tcp --port 22
 
 #
+ipaddr="$(
+  mussel instance show "${instance_id}" \
+  | egrep ":address:" \
+  | awk '{print $2}'
+)"
+
 ssh -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i mykeypair root@${ipaddr}" hostname
 ```
 
