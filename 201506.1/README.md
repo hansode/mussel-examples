@@ -206,6 +206,7 @@ cat <<EOS > vifs.json
 {
  "eth0":{"network":"nw-demo1","security_groups":"${security_group_id}"}
 }
+EOS
 instance_id="$(
   mussel instance create \
     --cpu-cores    1              \
@@ -307,6 +308,7 @@ cat <<EOS > vifs.json
 {
  "eth0":{"network":"nw-demo1","security_groups":"${security_group_id}"}
 }
+EOS
 instance_id="$(
   mussel instance create \
    --cpu-cores     1              \
