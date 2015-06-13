@@ -285,7 +285,7 @@ set -x
 
 #
 ssh-keygen -N "" -f mykeypair
-ssh_key_id"$(
+ssh_key_id="$(
   mussel ssh_key_pair create \
    --public-key    mykeypair.pub \
    --output-format id
