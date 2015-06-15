@@ -1,13 +1,22 @@
 # 改善案レポート
 
+## 本件の目的
+
+> mussel <resource> createに--output-format idオプションを導入し、スクリプト作成をしやすくする
+
+これを実装し、「uuidを取得する為のパイプ、egrepコマンド、awkコマンドを削除」の効果を確認する。
+
+## 新機能：「output filter」
+
 https://github.com/axsh/wakame-vdc/tree/feature-mussel-filter-task
 
 + 【特徴】: musselの出力結果を最小化
 + 【使い方】: 環境変数`MUSSEL_OUTPUT_FORMAT`に`minimal`を指定
 
-## output filter 機能反映版スクリプト
+## output filter 機能反映版スクリプト例
 
-~/.musselrc:
+
+`~/.musselrc`:
 
 ```
 $ cat ~/.musselrc
@@ -15,14 +24,13 @@ DCMGR_HOST=10.0.2.2
 account_id=a-shpoolxx
 ```
 
-sample:
+`output-filter-feature-sample.sh`:
 
 ```
 #!/bin/bash
 
 set -e
 set -o pipefail
-set -x
 
 #
 export MUSSEL_CALLER= # make sure to set empty
@@ -114,6 +122,20 @@ rm -f sgrule.txt
 rm -f vifs.json
 rm -f "${keyname}" "${keyname}.pub"
 ```
+
+## 実行結果例
+
+> ```
+> $ time ./output-filter-feature-sample.sh
+> ```
+
+![mussel-output-filter-demo](https://cloud.githubusercontent.com/assets/76867/8151379/f1e810ca-1346-11e5-8e0c-4ab63efc0d48.gif)
+
+> ```
+> $ time bash -x ./output-filter-feature-sample.sh
+> ```
+
+![mussel-output-filter-demo2](https://cloud.githubusercontent.com/assets/76867/8151404/7cc80f1a-1347-11e5-82dd-c4c6168a6b79.gif)
 
 ## ここまでのまとめ
 
