@@ -2,10 +2,10 @@
 
 https://github.com/axsh/wakame-vdc/tree/feature-mussel-filter-task
 
-## output filter 機能反映版スクリプト
++ 【特徴】: musselの出力結果を最小化
++ 【使い方】: 環境変数`MUSSEL_OUTPUT_FORMAT`に`minimal`を指定
 
-+ 環境変数`MUSSEL_OUTPUT_FORMAT`に`minimal`を指定
-  + musselの出力結果を最小化
+## output filter 機能反映版スクリプト
 
 ~/.musselrc:
 
