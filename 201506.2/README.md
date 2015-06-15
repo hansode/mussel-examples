@@ -11,7 +11,14 @@
 https://github.com/axsh/wakame-vdc/tree/feature-mussel-filter-task
 
 + 【特徴】: musselの出力結果を最小化
+   + HTTPメソッド毎に異なるフィルタ
+      + `POST`: `:id:`のみ表示
+      + `GET`: フィルタ無し状態, YAMLドキュメントがそのまま表示される
+      + `PUT`: 出力無し or 新リソースuuidを表示
+      + `DELETE`: 表示無し
 + 【使い方】: 環境変数`MUSSEL_OUTPUT_FORMAT`に`minimal`を指定
+   + ~/.musselrcで指定しても良い
+   + シェルスクリプト内で指定しても良い
 
 ## output filter 機能反映版スクリプト例
 
@@ -148,7 +155,16 @@ rm -f "${keyname}" "${keyname}.pub"
 + output filter機能をmerge
 + wait-for機能実装作業
   + 次の目的は、「retry_until関数排除」
++ APIに対応してないコマンドをmusselで実装
+  + 不要だからmusselで実装してないのか
+  + 必要なのにmusselで実装してないのか
+  + 選別する必要あり
+  + APIリファレンス作成と同時並行するのが良さそうか
 
 ### API
 
 + API新レスポンス機能検討
++ `PUT`の整理?
+   + 例えばinstance.backupは、新たなリソースを生成している
+   + `PUT` -> `POST` へ切り替え検討(by unakatsuo)
+      + 仮に切り替えるとしても、しばらくは互換性維持する必要あり
