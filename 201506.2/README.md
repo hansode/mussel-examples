@@ -117,7 +117,7 @@ rm -f "${keyname}" "${keyname}.pub"
 
 ## ここまでのまとめ
 
-+ uuidを取得する為のパイプ、egrepコマンド、awkコマンドを削除出来た
++ 目標の1つだった「uuidを取得する為のパイプ、egrepコマンド、awkコマンドを削除」を達成
 
 ## 今後へ向けて
 
@@ -125,7 +125,7 @@ rm -f "${keyname}" "${keyname}.pub"
 
 + output filter機能をmerge
 + wait-for機能実装作業
-  + 目的は、retry_until関数排除
+  + 次の目的は、「retry_until関数排除」
 
 ### API
 
